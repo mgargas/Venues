@@ -6,7 +6,7 @@ import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.{post, _}
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
@@ -87,6 +87,22 @@ object WebServer extends JsonSupport {
         onSuccess(deleted) {
           case Some(_) => complete(id.toString)
           case None => complete(StatusCodes.NotFound)
+        }
+      },
+      post {
+        path("buy") {
+          logger.info("Received POST request for venue " + id)
+          entity(as[Player]) { player =>
+            logger.info(s"Player $player wants to buy venue " + id)
+            val maybeBuyResult = Future {
+              serverState.buyVenue(id, player.playerId)
+            }
+            onSuccess(maybeBuyResult) {
+              case Some(buyResult) =>
+                complete(buyResult.toString)
+              case None => complete(StatusCodes.NotFound)
+            }
+          }
         }
       }
     )
