@@ -71,6 +71,10 @@ class RoutingSpec extends WordSpec with Matchers with ScalatestRouteTest {
         status shouldBe OK
         responseAs[String].contains("owner: player2")
       }
+      Delete(s"/venues/$venueId") ~> mainRoute ~> check {
+        status shouldBe OK
+        responseAs[String] shouldEqual venueId
+      }
     }
 
     "respond with message telling that venue has been already bought" in {

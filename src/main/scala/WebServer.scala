@@ -1,6 +1,6 @@
 import java.util.UUID
 
-import Model.{Player, Venue}
+import Model.{BuyVenue, Player, PutVenue, Venue}
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.Http
@@ -30,6 +30,8 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   }
 
   implicit val venueFormat: RootJsonFormat[Venue] = jsonFormat4(Venue)
+  implicit val putVenueFormat: RootJsonFormat[PutVenue] = jsonFormat2(PutVenue)
+  implicit val buyVenueFormat: RootJsonFormat[BuyVenue] = jsonFormat1(BuyVenue)
 
 }
 
@@ -72,9 +74,9 @@ object WebServer extends JsonSupport {
       },
       put {
         logger.info("Received PUT request for venue " + id)
-        entity(as[Venue]) { venue =>
+        entity(as[PutVenue]) { putVenue =>
           val saved: Future[Unit] = Future {
-            serverState.saveVenue(venue.copy(id = Option(id)))
+            serverState.saveVenue(Venue(id = Some(id), name = putVenue.name, price = putVenue.price, owner = None))
           }
           onSuccess(saved)(complete(id.toString))
         }
