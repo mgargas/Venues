@@ -1,8 +1,10 @@
+import sbt.util
+
 name := "venues"
 
 version := "0.1"
 
-scalaVersion := "2.13.0"
+scalaVersion := "2.12.8"
 
 libraryDependencies ++= {
   val akkaVersion       = "2.5.11"
@@ -17,3 +19,5 @@ libraryDependencies ++= {
     "org.scalatest" %% "scalatest" % "3.0.5" % "test"
   )
 }
+
+logLevel := Level.Info
