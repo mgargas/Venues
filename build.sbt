@@ -1,10 +1,11 @@
-import sbt.util
-
 name := "venues"
 
 version := "0.1"
 
 scalaVersion := "2.12.8"
+
+mainClass in (Compile, run) := Some("WebServer")
+
 
 libraryDependencies ++= {
   val akkaVersion       = "2.5.11"
