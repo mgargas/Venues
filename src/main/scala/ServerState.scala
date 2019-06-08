@@ -5,24 +5,21 @@ import Model.{Player, Venue}
 import scala.collection.mutable
 
 sealed trait BuyResult
-sealed case class CantAfford(player: Player, venue: Venue) extends BuyResult {
+sealed case class CantAfford(playerId: String, venue: Venue) extends BuyResult {
   override def toString: String = {
-    val playerId = player.playerId
     val venueName = venue.name
     s"$playerId can't afford $venueName"
   }
 }
-sealed case class Bought(player: Player, venue: Venue) extends BuyResult {
+sealed case class Bought(playerId: String, venue: Venue) extends BuyResult {
   override def toString: String = {
-    val playerId = player.playerId
     val venueName = venue.name
     val price = venue.price
     s"$venueName was bought by $playerId for $price"
   }
 }
-sealed case class AlreadyBought(player: Player, venue: Venue) extends BuyResult {
+sealed case class AlreadyBought(playerId: String, venue: Venue) extends BuyResult {
   override def toString: String = {
-    val playerId = player.playerId
     val venueName = venue.name
     val price = venue.price
     s"$venueName has been already bought by $playerId for $price"
@@ -40,6 +37,9 @@ case class ServerState(venues: mutable.Map[UUID, Venue], players: mutable.Map[St
     venues.get(id) match {
       case Some(venue) if venue.owner.isEmpty => venues.update(id, venueToSave)
       case None => venues.update(id, venueToSave)
+      case _ =>
+        println("jaja")
+        Unit
     }
   }
 
@@ -56,11 +56,11 @@ case class ServerState(venues: mutable.Map[UUID, Venue], players: mutable.Map[St
               val playerMoney = player.money.getOrElse(BigDecimal(0))
               val venuePrice = venue.price
               if (playerMoney >= venuePrice) {
-                venues.update(venueId, venue.copy(owner = Some(player)))
+                venues.update(venueId, venue.copy(owner = Some(playerId)))
                 players.update(playerId, player.copy(money = Some(playerMoney - venuePrice)))
-                Bought(player, venue)
+                Bought(playerId, venue)
               } else {
-                CantAfford(player, venue)
+                CantAfford(playerId, venue)
               }
             })
         }
