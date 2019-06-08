@@ -1,14 +1,18 @@
 import RequestHelpers._
 import WebServer.mainRoute
 import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.server.ValidationRejection
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalatest.{Matchers, WordSpec}
+
+import scala.language.postfixOps
 
 class RoutingSpec extends WordSpec with Matchers with ScalatestRouteTest {
   WebServer.main(Array.empty)
   val venueId = "687e8292-1afd-4cf7-87db-ec49a3ed93b1"
   val venueName = "Rynek Główny"
   val venuePrice = BigDecimal(1000)
+  val venueInvalidPrice = BigDecimal(-123)
   "Service" should {
 
     "respond with empty venues list" in {
@@ -22,6 +26,18 @@ class RoutingSpec extends WordSpec with Matchers with ScalatestRouteTest {
       putVenueRequest(venueId, putVenueJson(venueName, venuePrice)) ~> mainRoute ~> check {
         status shouldBe OK
         responseAs[String] shouldEqual venueId
+      }
+    }
+
+    "give rejection when one try to put venue with negative number as a price" in {
+      putVenueRequest(venueId, putVenueJson(venueName, venueInvalidPrice)) ~> mainRoute ~> check {
+        rejection.ensuring(_.isInstanceOf[ValidationRejection])
+      }
+    }
+
+    "give rejection when one try to put venue without name" in {
+      putVenueRequest(venueId, putVenueJson(venueName, venueInvalidPrice)) ~> mainRoute ~> check {
+        rejection.ensuring(_.isInstanceOf[ValidationRejection])
       }
     }
 

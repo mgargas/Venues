@@ -39,7 +39,6 @@ object WebServer extends JsonSupport {
   private implicit val system: ActorSystem = ActorSystem()
   private implicit val materializer: ActorMaterializer = ActorMaterializer()
   private implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-
   private val logger = Logging.getLogger(system, this)
   private val serverState = ServerState(
     mutable.Map.empty[UUID, Venue],
@@ -94,10 +93,11 @@ object WebServer extends JsonSupport {
       post {
         path("buy") {
           logger.info("Received POST request for venue " + id)
-          entity(as[Player]) { player =>
-            logger.info(s"Player $player wants to buy venue " + id)
+          entity(as[BuyVenue]) { buyVenue =>
+            val playerId = buyVenue.playerId
+            logger.info(s"Player $playerId wants to buy venue " + id)
             val maybeBuyResult = Future {
-              serverState.buyVenue(id, player.playerId)
+              serverState.buyVenue(id, playerId)
             }
             onSuccess(maybeBuyResult) {
               case Some(buyResult) =>
