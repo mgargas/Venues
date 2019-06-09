@@ -67,3 +67,29 @@ Each restart of the application resets the state to the above.
   }
 ]
 ```
+
+#### Scenario 3: Buying a venue that has been already bought
+```
+> curl -XPOST -H "Content-Type: application/json" http://localhost:8080/venues/687e8292-1afd-4cf7-87db-ec49a3ed93b1/buy -d '{
+  "playerId": "player2"
+}'
+"Rynek Główny was bought by player2 for 1000"
+```
+
+```
+> curl http://localhost:8080/venues
+[
+  {
+    "id": "687e8292-1afd-4cf7-87db-ec49a3ed93b1",
+    "name": "Rynek Główny",
+    "price": 1000,
+    "owner:" "player2"
+  }
+]
+```
+```
+> curl -XPOST -H "Content-Type: application/json" http://localhost:8080/venues/687e8292-1afd-4cf7-87db-ec49a3ed93b1/buy -d '{
+  "playerId": "player2"
+}'
+"Rynek Główny has been already bought by player2 for 1000"
+```
