@@ -33,7 +33,7 @@ case class ServerState(venues: mutable.Map[UUID, Venue], players: mutable.Map[St
   def getVenue(id: UUID): Option[Venue] = venues.get(id)
 
   def saveVenue(venueToSave: Venue): Unit = {
-    val id = venueToSave.id.get
+    val id = venueToSave.id
     venues.get(id) match {
       case Some(venue) if venue.owner.isEmpty => venues.update(id, venueToSave)
       case None => venues.update(id, venueToSave)

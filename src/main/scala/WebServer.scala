@@ -75,7 +75,7 @@ object WebServer extends JsonSupport {
         logger.info("Received PUT request for venue " + id)
         entity(as[PutVenue]) { putVenue =>
           val saved: Future[Unit] = Future {
-            serverState.saveVenue(Venue(id = Some(id), name = putVenue.name, price = putVenue.price, owner = None))
+            serverState.saveVenue(Venue(id = id, name = putVenue.name, price = putVenue.price, owner = None))
           }
           onSuccess(saved)(complete(id.toString))
         }
